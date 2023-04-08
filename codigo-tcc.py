@@ -1,0 +1,1020 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# # TCC
+
+# In[96]:
+
+
+import pandas as pd
+import requests
+from zipfile import ZipFile
+from io import BytesIO
+import numpy as np
+pd.set_option('display.max_columns', None)
+
+
+# In[97]:
+
+
+response = requests.get("https://archive.ics.uci.edu/ml/machine-learning-databases/00296/dataset_diabetes.zip")
+files = ZipFile(BytesIO(response.content))
+df = pd.read_csv(files.open("dataset_diabetes/diabetic_data.csv"))
+
+
+# In[98]:
+
+
+#variavel para pegar as colunas do df em fomra de lista
+cols = df.columns
+
+#variavel para selecionar colunas numéricas do df
+num_cols = df._get_numeric_data().columns
+
+#variavel que diminui as colunas numéricas das colunas, obtendo-se as colunas categóricas
+cat_col = list(set(cols) - set(num_cols))
+
+#laço for para valores únicos categóricos
+for coluna in cat_col:
+    print(coluna + str(df[coluna].unique()) + '\n')
+    
+#laço for para valores únicos numéricos
+for col in num_cols:
+    print( str(type(col)) + col + str(df[col].unique()) + '\n')
+
+
+# In[99]:
+
+
+#valores a serem excluídos
+drop_values = ["?","Unknown/Invalid"]
+
+#lógica para excluir linhas que possuem valores na lista drop_values
+df = df[~df.isin(drop_values).any(axis=1)]
+
+
+# In[100]:
+
+
+cols = df.columns
+
+#variavel para selecionar colunas numéricas do df
+num_cols = df._get_numeric_data().columns
+
+#variavel que diminui as colunas numéricas das colunas, obtendo-se as colunas categóricas
+cat_col = list(set(cols) - set(num_cols))
+
+#laço for para valores únicos categóricos
+for coluna in cat_col:
+    print(coluna + str(df[coluna].unique()) + '\n')
+    
+#laço for para valores únicos numéricos
+for col in num_cols:
+    print( str(type(col)) + col + str(df[col].unique()) + '\n')
+
+
+# In[101]:
+
+
+df.shape
+
+
+# In[102]:
+
+
+df.isnull().sum()
+
+
+# In[103]:
+
+
+colunas_excluidas = ['payer_code'
+,'medical_specialty'
+,'admission_type_id'
+,'admission_source_id'                     
+,'discharge_disposition_id'
+,'patient_nbr']
+
+df = df.drop(colunas_excluidas, axis = 1)
+
+
+# In[104]:
+
+
+df['diag_1'] = df['diag_1'].astype(pd.StringDtype())
+
+
+# In[105]:
+
+
+df['diag_2'] = df['diag_2'].astype(pd.StringDtype())
+
+
+# In[106]:
+
+
+df['diag_3'] = df['diag_3'].astype(pd.StringDtype())
+
+
+# In[107]:
+
+
+df['glipizide-metformin'] = df['glipizide-metformin'].map({'No': 0}) #['No']
+
+
+# In[108]:
+
+
+df['change'] = df['change'].map({'No': 0, 'Ch': 1}) #['Ch' 'No']
+
+
+# In[109]:
+
+
+df['tolbutamide'] = df['tolbutamide'].map({'No': 0}) #['No']
+
+
+# In[110]:
+
+
+df['examide'] = df['examide'].map({'No': 0}) #['No']
+
+
+# In[111]:
+
+
+df['pioglitazone'] = df['pioglitazone'].map({'No': 0, 'Steady': 1,'Up': 2, 'Down': 3}) #['No' 'Steady' 'Up' 'Down']
+
+
+# In[112]:
+
+
+df['diabetesMed'] = df['diabetesMed'].map({'No': 0, 'Yes': 1}) #['Yes' 'No']
+
+
+# In[113]:
+
+
+df['citoglipton'] = df['citoglipton'].map({'No': 0}) #['No']
+
+
+# In[114]:
+
+
+df['insulin'] = df['insulin'].map({'Steady': 0, 'No': 1,'Down': 2, 'Up': 3}) #['Steady' 'No' 'Down' 'Up']
+
+
+# In[115]:
+
+
+df['troglitazone'] = df['troglitazone'].map({'No': 0}) #['No']
+
+
+# In[116]:
+
+
+df['glimepiride-pioglitazone'] = df['glimepiride-pioglitazone'].map({'No': 0}) #['No']
+
+
+# In[117]:
+
+
+df['glyburide-metformin'] = df['glyburide-metformin'].map({'No': 0}) #['No']
+
+
+# In[118]:
+
+
+df['metformin-pioglitazone'] = df['metformin-pioglitazone'].map({'No': 0}) #['No']
+
+
+# In[119]:
+
+
+df['miglitol'] = df['miglitol'].map({'No': 0}) #['No']
+
+
+# In[120]:
+
+
+df['glyburide'] = df['glyburide'].map({'No': 0, 'Steady': 1,'Up': 2, 'Down':3}) #['No' 'Steady' 'Up' 'Down']
+
+
+# In[121]:
+
+
+df['tolazamide'] = df['tolazamide'].map({'No': 0}) #['No']
+
+
+# In[122]:
+
+
+df['max_glu_serum'] = df['max_glu_serum'].map({'None': 0, 'Norm': 1,'>200': 2, '>300':3}) #['None' '>300' 'Norm' '>200']
+
+
+# In[123]:
+
+
+df['nateglinide'] = df['nateglinide'].map({'No': 0, 'Steady': 1}) #['No' 'Steady']
+
+
+# In[124]:
+
+
+df['metformin-rosiglitazone'] = df['metformin-rosiglitazone'].map({'No': 0}) #['No']
+
+
+# In[125]:
+
+
+df['glimepiride'] = df['glimepiride'].map({'No': 0, 'Steady': 1,'Down': 2, 'Up': 3}) #['No' 'Steady' 'Down' 'Up']
+
+
+# In[126]:
+
+
+df['metformin'] = df['metformin'].map({'No': 0, 'Steady': 1,'Up': 2, 'Down': 3}) #['No' 'Steady' 'Up' 'Down']
+
+
+# In[127]:
+
+
+df['A1Cresult'] = df['A1Cresult'].map({'None': 0, 'Norm': 1,'>8': 2, '>7': 3}) #['None' 'Norm' '>8' '>7']
+
+
+# In[128]:
+
+
+df['chlorpropamide'] = df['chlorpropamide'].map({'No': 0}) #['No']
+
+
+# In[129]:
+
+
+df['acetohexamide'] = df['acetohexamide'].map({'No': 0}) #['No']
+
+
+# In[130]:
+
+
+df['rosiglitazone'] = df['rosiglitazone'].map({'No': 0, 'Steady': 1})
+
+
+# In[131]:
+
+
+df['glipizide'] = df['glipizide'].map({'Steady': 0, 'No': 1,'Up': 2, 'Down': 3})
+
+
+# In[132]:
+
+
+df['acarbose'] = df['acarbose'].map({'No': 0, 'Steady': 1})
+
+
+# In[133]:
+
+
+df['repaglinide'] = df['repaglinide'].map({'No': 0, 'Steady': 1,'Up': 2})
+
+
+# In[134]:
+
+
+df['readmitted'] = df['readmitted'].map({'NO': 0, '<30': 1,'>30': 1})
+
+
+# In[135]:
+
+
+df["gender"] = df['gender'].map({'Male': 0, 'Female': 1})
+
+
+# In[136]:
+
+
+df["age"] = df['age'].map({'[0-10)': 0, '[10-20)': 1, '[20-30)': 2, '[30-40)': 3, '[40-50)': 4, '[50-60)': 5, '[60-70)': 6, '[70-80)': 7, '[80-90)': 8, '[90-100': 9})
+
+
+# In[137]:
+
+
+df['race'] = df['race'].map({'Caucasian': 0, 'AfricanAmerican': 1,'Asian': 2, 'Hispanic': 3, 'Other': 4})
+
+
+# In[138]:
+
+
+df["weight"] = df['weight'].map({'[0-25)': 0, '[25-50)': 1, '[50-75)': 2, '[75-100)': 3, '[100-125)': 4, '[125-150)': 5, '[150-175)': 6, '[175-200)': 7})
+
+
+# In[139]:
+
+
+df[df['age'].isnull()]
+
+
+# In[140]:
+
+
+df = df.dropna()
+
+
+# In[141]:
+
+
+df.shape
+
+
+# In[142]:
+
+
+Circulatory = np.arange(390,460).tolist() + [785]
+Circulatory_str = [str(elemento) for elemento in Circulatory]
+
+
+# In[143]:
+
+
+Respiratory = np.arange(460,520).tolist() + [786]
+Respiratory_str = [str(elemento) for elemento in Respiratory]
+
+
+# In[144]:
+
+
+Digestive = np.arange(520,580).tolist() + [787]
+Digestive_str = [str(elemento) for elemento in Digestive]
+
+
+# In[145]:
+
+
+Injury = np.arange(800,1000).tolist() + [786]
+Injury_str = [str(elemento) for elemento in Injury]
+
+
+# In[146]:
+
+
+Musculoskeletal = np.arange(710,740).tolist() + [786]
+Musculoskeletal_str = [str(elemento) for elemento in Musculoskeletal]
+
+
+# In[147]:
+
+
+Genitourinary = np.arange(580,630).tolist() +  [788]
+Genitourinary_str = [str(elemento) for elemento in Genitourinary]
+
+
+# In[148]:
+
+
+Neoplasms = np.arange(140,240).tolist()
+Neoplasms_str = [str(elemento) for elemento in Neoplasms]
+
+
+# In[149]:
+
+
+Other = np.arange(240,250).tolist() + np.arange(251,280).tolist() + [780,781,784,790,791,792,793,794,795,796,797,798,799] 
+Other_str = [str(elemento) for elemento in Other]
+
+
+# In[150]:
+
+
+df.loc[df['diag_1'].str.startswith('250'), 'diag_1'] = 'Diabetes'
+df.loc[df['diag_2'].str.startswith('250'), 'diag_2'] = 'Diabetes'
+df.loc[df['diag_3'].str.startswith('250'), 'diag_3'] = 'Diabetes'
+
+
+# In[151]:
+
+
+df.loc[df['diag_1'].isin(Circulatory_str), 'diag_1'] = 'Circulatory'
+df.loc[df['diag_1'].isin(Respiratory_str), 'diag_1'] = 'Respiratory'
+df.loc[df['diag_1'].isin(Digestive_str), 'diag_1'] = 'Digestive'
+df.loc[df['diag_1'].isin(Injury_str), 'diag_1'] = 'Injury'
+df.loc[df['diag_1'].isin(Musculoskeletal_str), 'diag_1'] = 'Musculoskeletal'
+df.loc[df['diag_1'].isin(Genitourinary_str), 'diag_1'] = 'Genitourinary'
+df.loc[df['diag_1'].isin(Neoplasms_str), 'diag_1'] = 'Neoplasms'
+
+
+# In[152]:
+
+
+df.loc[df['diag_2'].isin(Circulatory_str), 'diag_2'] = 'Circulatory'
+df.loc[df['diag_2'].isin(Respiratory_str), 'diag_2'] = 'Respiratory'
+df.loc[df['diag_2'].isin(Digestive_str), 'diag_2'] = 'Digestive'
+df.loc[df['diag_2'].isin(Injury_str), 'diag_2'] = 'Injury'
+df.loc[df['diag_2'].isin(Musculoskeletal_str), 'diag_2'] = 'Musculoskeletal'
+df.loc[df['diag_2'].isin(Genitourinary_str), 'diag_2'] = 'Genitourinary'
+df.loc[df['diag_2'].isin(Neoplasms_str), 'diag_2'] = 'Neoplasms'
+
+
+# In[153]:
+
+
+df.loc[df['diag_3'].isin(Circulatory_str), 'diag_3'] = 'Circulatory'
+df.loc[df['diag_3'].isin(Respiratory_str), 'diag_3'] = 'Respiratory'
+df.loc[df['diag_3'].isin(Digestive_str), 'diag_3'] = 'Digestive'
+df.loc[df['diag_3'].isin(Injury_str), 'diag_3'] = 'Injury'
+df.loc[df['diag_3'].isin(Musculoskeletal_str), 'diag_3'] = 'Musculoskeletal'
+df.loc[df['diag_3'].isin(Genitourinary_str), 'diag_3'] = 'Genitourinary'
+df.loc[df['diag_3'].isin(Neoplasms_str), 'diag_3'] = 'Neoplasms'
+
+
+# df['diagnosis_1'] = df['diag_1'].apply(lambda x: 'Circulatory' if x in Circulatory_str else None)
+# df['diagnosis_1'] = df['diag_1'].apply(lambda x: 'Respiratory' if x in Respiratory_str else None)
+# df['diagnosis_1'] = df['diag_1'].apply(lambda x: 'Digestive' if x in Digestive_str else None)
+# df['diagnosis_1'] = df['diag_1'].apply(lambda x: 'Injury' if x in Injury_str else None)
+# df['diagnosis_1'] = df['diag_1'].apply(lambda x: 'Musculoskeletal' if x in Musculoskeletal_str else None)
+# df['diagnosis_1'] = df['diag_1'].apply(lambda x: 'Genitourinary' if x in Genitourinary_str else None)
+# df['diagnosis_1'] = df['diag_1'].apply(lambda x: 'Neoplasms' if x in Neoplasms_str else None)
+
+# In[154]:
+
+
+df
+
+
+# In[155]:
+
+
+patology = ["Circulatory","Respiratory","Digestive","Injury","Musculoskeletal","Genitourinary","Neoplasms"]
+
+
+# In[156]:
+
+
+df.loc[~df['diag_1'].isin(patology), 'diag_1'] = 'Other'
+
+
+# In[157]:
+
+
+df.loc[~df['diag_2'].isin(patology), 'diag_2'] = 'Other'
+
+
+# In[158]:
+
+
+df.loc[~df['diag_3'].isin(patology), 'diag_3'] = 'Other'
+
+
+# In[159]:
+
+
+colunas_excluidas_2 = ['encounter_id']
+
+df = df.drop(colunas_excluidas_2, axis = 1)
+
+
+# In[160]:
+
+
+len(df["diag_1"].unique()) == len(df["diag_2"].unique()) == len(df["diag_3"].unique())
+
+
+# In[161]:
+
+
+df["diag_2"].unique()
+
+
+# In[162]:
+
+
+df["diag_3"].unique()
+
+
+# In[163]:
+
+
+df
+
+
+# In[164]:
+
+
+diags = ['diag_1','diag_2','diag_3']
+for diag in diags:
+    df[diag] = df[diag].map({'Circulatory': 0, 'Respiratory': 1,'Digestive': 2, 'Injury': 3
+                , 'Musculoskeletal': 4, 'Genitourinary': 5, 'Neoplasms': 6, 'Other': 7})
+
+
+# In[165]:
+
+
+df.info()
+
+
+# In[166]:
+
+
+df['age'] = df['age'].astype(int)
+
+
+# In[167]:
+
+
+df.info()
+
+
+# In[168]:
+
+
+df
+
+
+# In[169]:
+
+
+import pandas as pd
+pd.set_option('display.max_columns', None)
+import requests
+from zipfile import ZipFile
+from io import BytesIO
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import cross_val_score
+from sklearn import preprocessing
+import numpy as np
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+
+
+# In[170]:
+
+
+X = df.drop('readmitted',axis=1).values
+y = df['readmitted'].values
+
+
+# In[171]:
+
+
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.3,random_state=0)
+
+
+# In[172]:
+
+
+#Setup arrays to store training and test accuracies
+neighbors = np.arange(1,100)
+train_accuracy =np.empty(len(neighbors))
+test_accuracy = np.empty(len(neighbors))
+
+for i,k in enumerate(neighbors):
+    #Setup a knn classifier with k neighbors
+    knn = KNeighborsClassifier(n_neighbors=k)
+    
+    #Fit the model
+    knn.fit(X_train, y_train)
+    
+    #Compute accuracy on the training set
+    train_accuracy[i] = knn.score(X_train, y_train)
+    
+    #Compute accuracy on the test set
+    test_accuracy[i] = knn.score(X_test, y_test) 
+
+
+# In[173]:
+
+
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+
+
+# In[174]:
+
+
+plt.title('k-NN Varying number of neighbors')
+plt.plot(neighbors, test_accuracy, label='Testing Accuracy')
+plt.plot(neighbors, train_accuracy, label='Training accuracy')
+plt.legend()
+plt.xlabel('Number of neighbors')
+plt.ylabel('Accuracy')
+plt.show()
+
+
+# In[175]:
+
+
+#Best K value selection
+neig = np.arange(1,100)
+train_accuracy = []
+test_accuracy = []
+for i, k in enumerate (neig):
+    knn = KNeighborsClassifier(n_neighbors = k)
+    knn.fit(X_train,y_train)
+    train_accuracy.append(knn.score(X_train,y_train))
+    test_accuracy.append(knn.score(X_test,y_test))
+
+# Plot
+plt.figure(figsize=(13,8))
+plt.plot(neig, test_accuracy, label = 'Testing Accuracy')
+plt.plot(neig, train_accuracy, label = 'Training Accuracy')
+plt.legend()
+plt.title('-value vs. Accuracy')
+plt.xlabel('Number of Neighbors')
+plt.ylabel('Accuracy')
+plt.xticks(neig)
+plt.savefig('graph.png')
+plt.show()
+print('Best Accuracy is {} with K = {}'.format(round(np.max(test_accuracy)),1+test_accuracy.index(np.max(test_accuracy))))
+
+
+# In[176]:
+
+
+knn = KNeighborsClassifier(n_neighbors=74)
+knn.fit(X_train,y_train)
+print(round(knn.score(X_test,y_test),2) * 100)
+
+
+# In[177]:
+
+
+y_pred = knn.predict(X_test)
+
+
+# In[178]:
+
+
+confusion_matrix(y_test,y_pred)
+
+
+# In[179]:
+
+
+pd.crosstab(y_test, y_pred, rownames=['True'], colnames=['Predicted'], margins=True)
+
+
+# In[180]:
+
+
+from sklearn.metrics import classification_report
+
+
+# In[181]:
+
+
+print(classification_report(y_test,y_pred))
+
+
+# In[182]:
+
+
+y_pred_proba = knn.predict_proba(X_test)[:,1]
+from sklearn.metrics import roc_curve
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
+
+plt.plot([0,1],[0,1],'k--')
+plt.plot(fpr,tpr, label='Knn')
+plt.xlabel('fpr')
+plt.ylabel('tpr')
+plt.title('Knn(n_neighbors=99) ROC curve')
+plt.show()
+
+
+# In[183]:
+
+
+from sklearn.metrics import roc_auc_score
+roc_auc_score(y_test,y_pred_proba)
+
+
+# In[184]:
+
+
+from sklearn.model_selection import GridSearchCV
+
+
+# In[185]:
+
+
+param_grid = {'n_neighbors':np.arange(1,30)}
+
+
+# In[186]:
+
+
+knn = KNeighborsClassifier()
+knn_cv= GridSearchCV(knn,param_grid,cv=5)
+knn_cv.fit(X,y)
+
+
+# In[187]:
+
+
+knn_cv.best_score_
+
+
+# In[188]:
+
+
+knn_cv.best_params_
+
+
+# # knn
+
+# In[191]:
+
+
+from sklearn.neighbors import KNeighborsClassifier
+knn = KNeighborsClassifier()
+knn = knn.fit(X_train, y_train)
+print("Acurácia: ", knn.score(X_train, y_train))
+tp_knn = knn.predict(X_test)
+print("Acurácia de previsão: ", accuracy_score(y_test, tp_knn))
+print(classification_report(y_test, tp_knn))
+
+
+# # bayes
+
+# In[190]:
+
+
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score, classification_report
+nb = GaussianNB()
+nb = nb.fit(X_train, y_train)
+print("Acurácia: ", nb.score(X_train, y_train))
+tp_nb = nb.predict(X_test)
+print("Acurácia de previsão: ", accuracy_score(y_test, tp_nb))
+print(classification_report(y_test, tp_nb))
+
+
+# # gradiente descendente
+
+# In[192]:
+
+
+from sklearn.linear_model import SGDClassifier
+sgd = SGDClassifier()
+sgd = sgd.fit(X_train, y_train)
+print("Acurácia: ", sgd.score(X_train, y_train))
+tp_sgd = sgd.predict(X_test)
+print("Acurácia de previsão: ", accuracy_score(y_test, tp_sgd))
+print(classification_report(y_test, tp_sgd))
+
+
+# # Exploração
+# 
+
+# In[193]:
+
+
+from collections import Counter
+import matplotlib.pyplot as plt
+
+
+# In[194]:
+
+
+df
+
+
+# In[195]:
+
+
+gender = Counter(df["gender"])
+gender
+
+
+# In[196]:
+
+
+age = Counter(df["age"])
+age
+
+
+# In[197]:
+
+
+weight = Counter(df["weight"])
+weight
+
+
+# In[198]:
+
+
+readmitted = Counter(df["readmitted"])
+readmitted
+
+
+# In[199]:
+
+
+race = Counter(df["race"])
+race
+
+
+# In[200]:
+
+
+plt.style.use('seaborn-pastel')
+plt.pie(gender.values(), labels = ["Mulheres","Homens"],
+autopct = '%1.1f%%', textprops={'fontsize': 11})
+plt.axis("image")
+plt.title("Gênero dos pacientes", fontsize=14,pad =12)
+plt.show()
+
+
+# In[201]:
+
+
+df.age.hist(bins=9, color = 'black', alpha = 0.6)
+plt.style.use('seaborn-whitegrid')
+plt.xlabel("Faixa etária idade")
+plt.ylabel("Quantidade de pessoas")
+plt.title("distribuição de idade (anos)")
+
+plt.show()
+
+
+# In[202]:
+
+
+df.weight.hist(bins=8, color = 'black', alpha = 0.6)
+plt.style.use('seaborn-whitegrid')
+plt.xlabel("Faixa de peso")
+plt.ylabel("Quantidade de pessoas")
+plt.title("Distribuição de peso (kg)")
+
+plt.show()
+
+
+# In[203]:
+
+
+df_readmitted = df.loc[df['readmitted'] == 1 ]
+
+
+# In[204]:
+
+
+df_not_readmitted = df.loc[df['readmitted'] == 0]
+
+
+# In[205]:
+
+
+df_readmitted,df_not_readmitted
+
+
+# In[206]:
+
+
+df_readmitted.describe(),df_not_readmitted.describe()
+
+
+# In[207]:
+
+
+gender_not_readmitted = Counter(df_not_readmitted["gender"])
+gender_not_readmitted
+
+
+# In[208]:
+
+
+gender_readmitted = Counter(df_readmitted["gender"])
+gender_readmitted
+
+
+# In[220]:
+
+
+plt.style.use('seaborn-pastel')
+plt.pie(gender_readmitted.values(), labels = ["Mulheres","Homens"],
+autopct = '%1.1f%%', textprops={'fontsize': 11})
+plt.axis("image")
+plt.title("Gênero dos pacientes readmitidos", fontsize=14,pad =12)
+plt.show()
+
+
+# In[221]:
+
+
+plt.style.use('seaborn-pastel')
+plt.pie(gender_not_readmitted.values(), labels = ["Mulheres","Homens"],
+autopct = '%1.1f%%', textprops={'fontsize': 11})
+plt.axis("image")
+plt.title("Gênero dos pacientes não readmitidos", fontsize=14,pad =12)
+plt.show()
+
+
+# In[211]:
+
+
+race_readmitted = Counter(df_readmitted["race"])
+race_readmitted
+
+
+# In[212]:
+
+
+race_not_readmitted = Counter(df_not_readmitted["race"])
+race_not_readmitted
+
+
+# In[213]:
+
+
+weight_readmitted = Counter(df_not_readmitted["weight"])
+weight_readmitted
+
+
+# In[214]:
+
+
+weight_not_readmitted = Counter(df_not_readmitted["weight"])
+weight_not_readmitted
+
+
+# In[215]:
+
+
+plt.style.use('seaborn-whitegrid')
+plt.bar(['M','F'], gender_readmitted.values())
+plt.ylabel('Número de pacientes')
+plt.xlabel('Raça')
+plt.title('pacientes por sexo - readmitidos')
+plt.show()
+
+plt.style.use('seaborn-whitegrid')
+plt.bar(['M','F'], gender_not_readmitted.values())
+plt.ylabel('Número de pacientes')
+plt.xlabel('Raça')
+plt.title('pacientes por sexo - não readmitidos')
+plt.show()
+
+
+# In[216]:
+
+
+plt.style.use('seaborn-whitegrid')
+plt.bar(list(race_readmitted.keys()), race_readmitted.values())
+plt.ylabel('Número de pacientes')
+plt.xlabel('Raça')
+plt.title('pacientes por raça - readmitidos')
+plt.show()
+
+plt.style.use('seaborn-whitegrid')
+plt.bar(list(race_not_readmitted.keys()), race_not_readmitted.values())
+plt.ylabel('Número de pacientes')
+plt.xlabel('Raça')
+plt.title('pacientes por raça - não readmitidos')
+plt.show()
+
+
+# In[222]:
+
+
+plt.style.use('seaborn-whitegrid')
+plt.bar(list(weight_readmitted.keys()), weight_readmitted.values())
+plt.ylabel('Número de pacientes')
+plt.xlabel('Peso (kg)')
+plt.title('Pacientes por peso (kg) - readmitidos')
+plt.show()
+
+plt.style.use('seaborn-whitegrid')
+plt.bar(list(weight_not_readmitted.keys()), weight_not_readmitted.values())
+plt.ylabel('Número de pacientes')
+plt.xlabel('Peso (kg)')
+plt.title('Pacientes por peso (kg) - não readmitidos')
+plt.show()
+
+
+# In[218]:
+
+
+num_race_readmitteds = sum(race_readmitted.values())
+for x, y in race_readmitted.items():
+    a = y/num_race_readmitteds*100
+    print(str(x) + ': ' +'\n'+ str(round(a,2)) + '%'+'\n')
+
+
+# In[219]:
+
+
+num_race_not_readmitteds = sum(race_not_readmitted.values())
+for x, y in race_not_readmitted.items():
+    a = y/num_race_not_readmitteds*100
+    print(str(x) + ': ' +'\n'+ str(round(a,2)) + '%'+'\n')
+
+
+# In[228]:
+
+
+df_readmitted.describe()
+
+
+# In[ ]:
+
+
+
+
